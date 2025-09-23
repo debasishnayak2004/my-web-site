@@ -325,3 +325,48 @@
     flakes = [];
     createFlakes();
   });
+
+  // Visitor Counter Section
+
+  const TOTAL_KEY = "visitors_total";
+  const TODAY_KEY = "visitors_today";
+  const TODAY_DATE_KEY = "visitors_today_date";
+  const SESSION_KEY = "visitor_session"; // to track new session
+
+  const GLOBAL_START = 50000;
+  const TODAY_START = 80;
+
+  const totalEl = document.getElementById("totalVisitors");
+  const todayEl = document.getElementById("todayVisitors");
+
+  function fmt(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  function updateCounters() {
+    let total = parseInt(localStorage.getItem(TOTAL_KEY) || GLOBAL_START);
+    let today = parseInt(localStorage.getItem(TODAY_KEY) || TODAY_START);
+    let todayDate = localStorage.getItem(TODAY_DATE_KEY);
+    const nowDate = new Date().toISOString().slice(0, 10);
+
+    // Reset daily counter if new date
+    if (todayDate !== nowDate) {
+      today = TODAY_START;
+      localStorage.setItem(TODAY_DATE_KEY, nowDate);
+    }
+
+    // Increment only if it's a new session
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+      total++;
+      today++;
+      localStorage.setItem(TOTAL_KEY, total);
+      localStorage.setItem(TODAY_KEY, today);
+      sessionStorage.setItem(SESSION_KEY, "active");
+    }
+
+    // Display
+    totalEl.textContent = fmt(total);
+    todayEl.textContent = fmt(today);
+  }
+
+  updateCounters();
